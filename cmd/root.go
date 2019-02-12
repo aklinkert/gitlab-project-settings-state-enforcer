@@ -9,7 +9,7 @@ import (
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "gitlab-repo-state-enforcer",
+	Use:   "gitlab-project-state-enforcer",
 	Short: "Enforces the settings of a bunch of GitLab repos",
 }
 

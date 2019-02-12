@@ -22,7 +22,7 @@
 
 package main
 
-import "github.com/Scalify/gitlab-repo-settings-state-enforcer/cmd"
+import "github.com/Scalify/gitlab-project-settings-state-enforcer/cmd"
 
 func main() {
 	cmd.Execute()

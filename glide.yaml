@@ -1,4 +1,4 @@
-package: github.com/Scalify/gitlab-repo-settings-state-enforcer
+package: github.com/Scalify/gitlab-project-settings-state-enforcer
 import:
 - package: github.com/spf13/cobra
 - package: github.com/apinnecke/go-exitcontext

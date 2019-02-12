@@ -1,0 +1,16 @@
+hash: fefdad6638dc25af1f56712a7fc06a30d5ec1fdeb7af473c4cbded931f8d13f5
+updated: 2019-02-12T16:06:53.770595521+01:00
+imports:
+- name: github.com/apinnecke/go-exitcontext
+  version: 06015046a58d57f896f5e2ea290e6540c3fba863
+- name: github.com/inconshreveable/mousetrap
+  version: 76626ae9c91c4f2a10f34cad8ce83ea42c93bb75
+- name: github.com/Sirupsen/logrus
+  version: e1e72e9de974bd926e5c56f83753fba2df402ce5
+- name: github.com/spf13/cobra
+  version: 7547e83b2d85fd1893c7d76916f67689d761fecb
+- name: github.com/spf13/pflag
+  version: 24fa6976df40757dce6aea913e7b81ade90530e1
+- name: github.com/xanzy/go-gitlab
+  version: 4dd9dfd296256b00081f6753d89c299c69ef327c
+testImports: []

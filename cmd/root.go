@@ -4,19 +4,50 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/Sirupsen/logrus"
+	"github.com/kelseyhightower/envconfig"
 	"github.com/spf13/cobra"
+
+	"github.com/Scalify/gitlab-project-settings-state-enforcer/pkg/config"
+)
+
+type envCfg struct {
+	GitlabEndpoint string `split_words:"true"`
+	GitlabToken    string `split_words:"true" required:"true"`
+	ConfigFile     string `split_words:"true" default:"./config.json"`
+	Verbose        bool
+}
+
+var (
+	env    = &envCfg{}
+	logger = logrus.New()
+	cfg    *config.Config
 )
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "gitlab-project-state-enforcer",
 	Short: "Enforces the settings of a bunch of GitLab repos",
-}
+	PersistentPreRun: func(cmd *cobra.Command, args []string) {
+		err := envconfig.Process("", env)
+		if err != nil {
+			logger.Fatal(err)
+		}
 
-func init() {
-	rootCmd.PersistentFlags().StringP("gitlab-endpoint", "e", "", "The API endpoint of a GitLab server (env: GITLAB_ENDPOINT)")
-	rootCmd.PersistentFlags().StringP("gitlab-token", "t", "", "The API endpoint of a GitLab server (env: GITLAB_TOKEN)")
-	rootCmd.PersistentFlags().StringP("config-path", "c", "./config.yaml", "The config to read the actionable settings from (env: CONFIG_PATH)")
+		logger.Infof("Loading config file from %v", env.ConfigFile)
+
+		cfg, err = config.Parse(env.ConfigFile)
+		if err != nil {
+			logger.Fatal(err)
+		}
+
+		if env.Verbose {
+			logger.SetLevel(logrus.DebugLevel)
+		} else {
+			logger.SetLevel(logrus.InfoLevel)
+		}
+
+	},
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.

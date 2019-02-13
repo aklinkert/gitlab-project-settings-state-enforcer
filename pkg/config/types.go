@@ -24,7 +24,6 @@ var (
 // settings documented at https://godoc.org/github.com/xanzy/go-gitlab#CreateProjectOptions
 type Config struct {
 	GroupName           string                     `json:"group_name"`
-	Recursive           bool                       `json:"recursive"`
 	CreateDefaultBranch bool                       `json:"create_default_branch"`
 	ProjectBlacklist    []string                   `json:"project_blacklist"`
 	ProjectWhitelist    []string                   `json:"project_whitelist"`
@@ -35,8 +34,8 @@ type Config struct {
 // ProtectedBranch defines who can act on a protected branch
 type ProtectedBranch struct {
 	Name             string      `json:"name"`
-	PushAccessLevel  AccessLevel `json:"pushAccessLevel"`
-	MergeAccessLevel AccessLevel `json:"mergeAccessLevel"`
+	PushAccessLevel  AccessLevel `json:"push_access_level"`
+	MergeAccessLevel AccessLevel `json:"merge_access_level"`
 }
 
 // AccessLevel wraps the numeric gitlab access level into a readable string

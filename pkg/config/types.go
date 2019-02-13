@@ -16,7 +16,6 @@ var (
 
 // Config stores the root group name and some additional configuration values
 // settings documented at https://godoc.org/github.com/xanzy/go-gitlab#CreateProjectOptions
-
 type Config struct {
 	GroupName        string                     `json:"groupName"`
 	Recursive        bool                       `json:"recursive"`

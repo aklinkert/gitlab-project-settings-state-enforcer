@@ -3,8 +3,6 @@ package gitlab
 import (
 	"fmt"
 
-	"github.com/xanzy/go-gitlab"
-
 	"github.com/Scalify/gitlab-project-settings-state-enforcer/pkg/config"
 	"github.com/Scalify/gitlab-project-settings-state-enforcer/pkg/internal/stringslice"
 
@@ -17,7 +15,6 @@ type ProjectManager struct {
 	groupsClient   groupsClient
 	projectsClient projectsClient
 	config         *config.Config
-	settings       *gitlab.EditProjectOptions
 }
 
 // NewProjectManager returns a new ProjectManager instance

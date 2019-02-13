@@ -10,18 +10,11 @@ import (
 
 // Parse takes the given configFilePath and reads the containing config file into a config struct
 func Parse(configFilePath string) (*Config, error) {
-	var err error
-	configFilePath, err = filepath.Abs(configFilePath)
-	if err != nil {
-		return nil, fmt.Errorf("error resolving file path  %v", err)
+	if err := checkFilePath(&configFilePath); err != nil {
+		return nil, err
 	}
 
-	if _, err := os.Stat(configFilePath); os.IsNotExist(err) {
-		return nil, errFileDoesNotExist
-	} else if err != nil {
-		return nil, fmt.Errorf("error checking config file: %v", err)
-	}
-
+	// nolint: gosec
 	b, err := ioutil.ReadFile(configFilePath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read config file %q: %v", configFilePath, err)
@@ -36,6 +29,22 @@ func Parse(configFilePath string) (*Config, error) {
 	}
 
 	return checkConfig(cfg)
+}
+
+func checkFilePath(configFilePath *string) error {
+	var err error
+	*configFilePath, err = filepath.Abs(*configFilePath)
+	if err != nil {
+		return fmt.Errorf("error resolving file path  %v", err)
+	}
+
+	if _, err = os.Stat(*configFilePath); os.IsNotExist(err) {
+		return errFileDoesNotExist
+	} else if err != nil {
+		return fmt.Errorf("error checking config file: %v", err)
+	}
+
+	return nil
 }
 
 func checkConfig(cfg *Config) (*Config, error) {

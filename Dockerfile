@@ -13,4 +13,4 @@ RUN apk --no-cache add ca-certificates
 WORKDIR /root/
 COPY --from=builder /go/src/github.com/Scalify/gitlab-project-settings-state-enforcer/bin/gitlab-project-settings-state-enforcer .
 RUN chmod +x gitlab-project-settings-state-enforcer
-ENTRYPOINT ["./gitlab-project-settings-state-enforcer"]
+ENTRYPOINT ["/root/gitlab-project-settings-state-enforcer"]

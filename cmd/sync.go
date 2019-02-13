@@ -19,7 +19,14 @@ var syncCmd = &cobra.Command{
 			}
 		}
 
-		manager := gl.NewProjectManager(logger.WithField("module", "project_manager"), client.Groups, client.Projects, cfg)
+		manager := gl.NewProjectManager(
+			logger.WithField("module", "project_manager"),
+			client.Groups,
+			client.Projects,
+			client.ProtectedBranches,
+			client.Branches,
+			cfg,
+		)
 
 		projects, err := manager.GetProjects()
 		if err != nil {
@@ -27,10 +34,14 @@ var syncCmd = &cobra.Command{
 		}
 
 		for _, project := range projects {
-			logger.Warnf("Updating project %s", project.FullPath)
+			logger.Infof("Updating project %s", project.FullPath)
+
+			if err := manager.EnsureBranchesAndProtection(project); err != nil {
+				logger.Errorf("failed to ensure branches of repo %v: %v", project.FullPath, err)
+			}
 
 			if err := manager.UpdateSettings(project); err != nil {
-				logger.Errorf("failed to update settings of repo %v: %v", project.ID, err)
+				logger.Errorf("failed to update settings of repo %v: %v", project.FullPath, err)
 			}
 		}
 	},

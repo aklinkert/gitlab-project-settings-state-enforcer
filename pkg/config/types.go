@@ -6,6 +6,7 @@ import (
 	"github.com/xanzy/go-gitlab"
 )
 
+// GitLab AccessLevel string aliases used in the config
 const (
 	AccessLevelDeveloper  = "developer"
 	AccessLevelMaintainer = "maintainer"
@@ -24,9 +25,9 @@ var (
 type Config struct {
 	GroupName           string                     `json:"group_name"`
 	Recursive           bool                       `json:"recursive"`
+	CreateDefaultBranch bool                       `json:"create_default_branch"`
 	ProjectBlacklist    []string                   `json:"project_blacklist"`
 	ProjectWhitelist    []string                   `json:"project_whitelist"`
-	CreateDefaultBranch bool                       `json:"create_default_branch"`
 	ProtectedBranches   []ProtectedBranch          `json:"protected_branches"`
 	Settings            *gitlab.EditProjectOptions `json:"settings"`
 }
@@ -38,8 +39,10 @@ type ProtectedBranch struct {
 	MergeAccessLevel AccessLevel `json:"mergeAccessLevel"`
 }
 
+// AccessLevel wraps the numeric gitlab access level into a readable string
 type AccessLevel string
 
+// Value returns the gitlab numeric value of the access level
 func (a AccessLevel) Value() *gitlab.AccessLevelValue {
 	switch a {
 	case AccessLevelDeveloper:

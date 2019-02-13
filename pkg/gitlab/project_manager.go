@@ -75,6 +75,7 @@ func (m *ProjectManager) GetProjects() ([]Project, error) {
 	return repos, nil
 }
 
+// EnsureBranchesAndProtection ensures that 1) the default branch exists and 2) all of the protected branches are configured correctly
 func (m *ProjectManager) EnsureBranchesAndProtection(project Project) error {
 	if err := m.ensureDefaultBranch(project); err != nil {
 		return err

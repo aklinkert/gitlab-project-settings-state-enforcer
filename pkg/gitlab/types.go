@@ -34,7 +34,6 @@ type branchesClient interface {
 
 var (
 	listGroupProjectOps = &gitlab.ListGroupProjectsOptions{
-		MinAccessLevel: gitlab.AccessLevel(gitlab.DeveloperPermissions),
 		ListOptions: gitlab.ListOptions{
 			PerPage: 100,
 		},

@@ -57,9 +57,5 @@ func checkConfig(cfg *Config) (*Config, error) {
 		return nil, errSettingsNameMustBeEmpty
 	}
 
-	if cfg.Settings.NamespaceID != nil {
-		return nil, errSettingsNamespaceMustBeEmpty
-	}
-
 	return cfg, nil
 }

@@ -9,7 +9,7 @@ import (
 	"github.com/Scalify/gitlab-project-settings-state-enforcer/pkg/config"
 	"github.com/Scalify/gitlab-project-settings-state-enforcer/pkg/internal/stringslice"
 
-	"github.com/Sirupsen/logrus"
+	"github.com/sirupsen/logrus"
 )
 
 // ProjectManager fetches a list of repositories from GitLab

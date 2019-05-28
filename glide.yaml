@@ -4,7 +4,7 @@ import:
 - package: github.com/apinnecke/go-exitcontext
 - package: github.com/xanzy/go-gitlab
   version: ^0.14.1
-- package: github.com/Sirupsen/logrus
+- package: github.com/sirupsen/logrus
   version: ^1.3.0
 - package: github.com/kelseyhightower/envconfig
   version: ^1.3.0

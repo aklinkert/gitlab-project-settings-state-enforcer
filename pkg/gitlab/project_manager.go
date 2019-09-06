@@ -53,21 +53,36 @@ func (m *ProjectManager) GetProjects() ([]Project, error) {
 		return []Project{}, fmt.Errorf("failed to fetch GitLab projects or group %q: %v", m.config.GroupName, err)
 	}
 
-	for _, p := range projects {
-		if len(m.config.ProjectWhitelist) > 0 && !stringslice.Contains(p.PathWithNamespace, m.config.ProjectWhitelist) {
-			m.logger.Debugf("Skipping repo %s as it's not whitelisted", p.PathWithNamespace)
-			continue
-		}
-		if stringslice.Contains(p.PathWithNamespace, m.config.ProjectBlacklist) {
-			m.logger.Debugf("Skipping repo %s as it's blacklisted", p.PathWithNamespace)
-			continue
+	for {
+		projects, resp, err := m.groupsClient.ListGroupProjects(m.config.GroupName, listGroupProjectOps, addIncludeSubgroups)
+		if err != nil {
+			return []Project{}, fmt.Errorf("failed to fetch GitLab projects or group %q: %v", m.config.GroupName, err)
 		}
 
-		repos = append(repos, Project{
-			ID:       p.ID,
-			Name:     p.Name,
-			FullPath: p.PathWithNamespace,
-		})
+		for _, p := range projects {
+			if len(m.config.ProjectWhitelist) > 0 && !stringslice.Contains(p.PathWithNamespace, m.config.ProjectWhitelist) {
+				m.logger.Debugf("Skipping repo %s as it's not whitelisted", p.PathWithNamespace)
+				continue
+			}
+			if stringslice.Contains(p.PathWithNamespace, m.config.ProjectBlacklist) {
+				m.logger.Debugf("Skipping repo %s as it's blacklisted", p.PathWithNamespace)
+				continue
+			}
+
+			repos = append(repos, Project{
+				ID:       p.ID,
+				Name:     p.Name,
+				FullPath: p.PathWithNamespace,
+			})
+		}
+
+		// Exit the loop when we've seen all pages.
+		if listGroupProjectOps.Page >= resp.TotalPages {
+			break
+		}
+
+		// Update the page number to get the next page.
+		listGroupProjectOps.Page = resp.NextPage
 	}
 
 	m.logger.Debugf("Fetching gitlab repos done. Got %d repos.", len(repos))

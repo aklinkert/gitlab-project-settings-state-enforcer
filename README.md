@@ -79,6 +79,36 @@ An example config might look like the following:
 }
 ```
 
+## Example GitLab pipeline
+
+Assuming that there are multiple different configurations within a `config` directory:
+
+```yaml
+stages:
+  - apply
+
+image:
+  name: scalify/gitlab-project-settings-state-enforcer
+  entrypoint: [""]
+
+apply-configs:
+  stage: apply
+  script:
+    - apk add --no-cache bash
+    - |
+      for file in configs/*; do
+          if [[ ! -f $file ]]; then
+            continue
+          fi
+
+          CONFIG_FILE="${file}" ~/gitlab-project-settings-state-enforcer sync
+      done
+
+  only:
+    - master
+
+```
+
 
 # License
 

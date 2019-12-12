@@ -21,10 +21,7 @@ var syncCmd = &cobra.Command{
 
 		manager := gl.NewProjectManager(
 			logger.WithField("module", "project_manager"),
-			client.Groups,
-			client.Projects,
-			client.ProtectedBranches,
-			client.Branches,
+			client,
 			cfg,
 		)
 

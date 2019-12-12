@@ -14,31 +14,22 @@ import (
 
 // ProjectManager fetches a list of repositories from GitLab
 type ProjectManager struct {
-	logger                  *logrus.Entry
-	groupsClient            groupsClient
-	projectsClient          projectsClient
-	protectedBranchesClient protectedBranchesClient
-	branchesClient          branchesClient
-	config                  *config.Config
+	logger *logrus.Entry
+	client *gitlab.Client
+	config *config.Config
 }
 
 // NewProjectManager returns a new ProjectManager instance
 func NewProjectManager(
 	logger *logrus.Entry,
-	groupsClient groupsClient,
-	projectsClient projectsClient,
-	protectedBranchesClient protectedBranchesClient,
-	branchesClient branchesClient,
+	client *gitlab.Client,
 	config *config.Config,
 ) *ProjectManager {
 
 	return &ProjectManager{
-		logger:                  logger,
-		groupsClient:            groupsClient,
-		projectsClient:          projectsClient,
-		protectedBranchesClient: protectedBranchesClient,
-		branchesClient:          branchesClient,
-		config:                  config,
+		logger: logger,
+		client: client,
+		config: config,
 	}
 }
 
@@ -48,7 +39,7 @@ func (m *ProjectManager) GetProjects() ([]Project, error) {
 
 	m.logger.Debugf("Fetching gitlab repos for group %s ...", m.config.GroupName)
 
-	projects, _, err := m.groupsClient.ListGroupProjects(m.config.GroupName, listGroupProjectOps, addIncludeSubgroups)
+	projects, _, err := m.client.Groups.ListGroupProjects(m.config.GroupName, listGroupProjectOps, addIncludeSubgroups)
 	if err != nil {
 		return []Project{}, fmt.Errorf("failed to fetch GitLab projects or group %q: %v", m.config.GroupName, err)
 	}
@@ -82,7 +73,7 @@ func (m *ProjectManager) EnsureBranchesAndProtection(project Project) error {
 	}
 
 	for _, b := range m.config.ProtectedBranches {
-		if resp, err := m.protectedBranchesClient.UnprotectRepositoryBranches(project.ID, b.Name); err != nil && resp.StatusCode != http.StatusNotFound {
+		if resp, err := m.client.ProtectedBranches.UnprotectRepositoryBranches(project.ID, b.Name); err != nil && resp.StatusCode != http.StatusNotFound {
 			return fmt.Errorf("failed to unprotect branch %v befor protection: %v", b.Name, err)
 		}
 
@@ -92,7 +83,7 @@ func (m *ProjectManager) EnsureBranchesAndProtection(project Project) error {
 			MergeAccessLevel: b.MergeAccessLevel.Value(),
 		}
 
-		if _, _, err := m.protectedBranchesClient.ProtectRepositoryBranches(project.ID, opt); err != nil {
+		if _, _, err := m.client.ProtectedBranches.ProtectRepositoryBranches(project.ID, opt); err != nil {
 			return fmt.Errorf("failed to protect branch %s: %v", b.Name, err)
 		}
 	}
@@ -114,7 +105,7 @@ func (m *ProjectManager) ensureDefaultBranch(project Project) error {
 
 	m.logger.Debugf("Ensuring default branch %s existence ... ", *opt.Branch)
 
-	_, resp, err := m.branchesClient.GetBranch(project.ID, *opt.Branch)
+	_, resp, err := m.client.Branches.GetBranch(project.ID, *opt.Branch)
 	if err == nil {
 		m.logger.Debugf("Ensuring default branch %s existence ... already exists!", *opt.Branch)
 		return nil
@@ -124,7 +115,7 @@ func (m *ProjectManager) ensureDefaultBranch(project Project) error {
 		return fmt.Errorf("failed to check for default branch existence, got unexpected response status code %d", resp.StatusCode)
 	}
 
-	if _, _, err := m.branchesClient.CreateBranch(project.ID, opt); err != nil {
+	if _, _, err := m.client.Branches.CreateBranch(project.ID, opt); err != nil {
 		return fmt.Errorf("failed to create default branch %s: %v", *opt.Branch, err)
 	}
 
@@ -135,7 +126,7 @@ func (m *ProjectManager) ensureDefaultBranch(project Project) error {
 func (m *ProjectManager) UpdateSettings(project Project) error {
 	m.logger.Debugf("Updating settings of project %s ...", project.FullPath)
 
-	if _, _, err := m.projectsClient.EditProject(project.ID, m.config.Settings); err != nil {
+	if _, _, err := m.client.Projects.EditProject(project.ID, m.config.Settings); err != nil {
 		return fmt.Errorf("failed to update settings or project %s: %v", project.FullPath, err)
 	}
 
